@@ -19,6 +19,22 @@ const CodeOutput = ({ code }: CodeOutputProps) => {
     });
   };
 
+  const handleDownload = () => {
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'generated-code.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: 'Скачано',
+      description: 'Файл сохранён на вашем устройстве',
+    });
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-4">
@@ -29,7 +45,7 @@ const CodeOutput = ({ code }: CodeOutputProps) => {
               <Icon name="Copy" className="mr-2 h-4 w-4" />
               Копировать
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleDownload}>
               <Icon name="Download" className="mr-2 h-4 w-4" />
               Скачать
             </Button>

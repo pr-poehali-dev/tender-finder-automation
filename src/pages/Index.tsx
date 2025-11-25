@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -12,7 +12,15 @@ const Index = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedUserId = localStorage.getItem('user_id');
+    if (savedUserId) {
+      setUserId(savedUserId);
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -31,8 +39,9 @@ const Index = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(userId && { 'X-User-Id': userId }),
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, user_id: userId }),
       });
 
       const data = await response.json();
@@ -46,10 +55,12 @@ const Index = () => {
         title: 'Успешно',
         description: 'Код сгенерирован',
       });
+      window.dispatchEvent(new Event('user-updated'));
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось сгенерировать код';
       toast({
         title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Не удалось сгенерировать код',
+        description: data?.error || errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -62,14 +73,27 @@ const Index = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <Icon name="Sparkles" className="h-4 w-4" />
+            Генерация кода с помощью GPT-4
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Создавайте код с помощью ИИ
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Опишите задачу на русском языке — получите готовый код за секунды
+          </p>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6">
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">ИИ Генератор Кода</h2>
-                  <p className="text-muted-foreground">
-                    Опишите задачу, и ИИ создаст готовый код
+                  <h2 className="text-xl font-semibold mb-2">Генератор кода</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Введите описание задачи и нажмите "Сгенерировать"
                   </p>
                 </div>
 

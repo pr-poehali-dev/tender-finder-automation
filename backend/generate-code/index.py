@@ -39,6 +39,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_str = '{}'
         body_data = json.loads(body_str)
         prompt = body_data.get('prompt', '')
+        user_id = body_data.get('user_id')
         
         if not prompt:
             return {
@@ -50,6 +51,32 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Prompt is required'})
             }
+        
+        if user_id:
+            import psycopg2
+            from psycopg2.extras import RealDictCursor
+            
+            database_url = os.environ.get('DATABASE_URL')
+            if database_url:
+                conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+                cur = conn.cursor()
+                
+                cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                
+                if user and not user['is_premium']:
+                    if user['free_requests_used'] >= user['free_requests_limit']:
+                        cur.close()
+                        conn.close()
+                        return {
+                            'statusCode': 403,
+                            'headers': {
+                                'Content-Type': 'application/json',
+                                'Access-Control-Allow-Origin': '*'
+                            },
+                            'isBase64Encoded': False,
+                            'body': json.dumps({'error': 'Free requests limit reached. Please upgrade to Pro.'})
+                        }
         
         openai_key = os.environ.get('OPENAI_API_KEY')
         if not openai_key:
@@ -93,6 +120,22 @@ def example_function():
         )
         
         generated_code = response.choices[0].message.content
+        
+        if user_id and database_url:
+            cur.execute(
+                "INSERT INTO usage_history (user_id, prompt, generated_code) VALUES (%s, %s, %s)",
+                (user_id, prompt, generated_code)
+            )
+            
+            if user and not user['is_premium']:
+                cur.execute(
+                    "UPDATE users SET free_requests_used = free_requests_used + 1 WHERE id = %s",
+                    (user_id,)
+                )
+            
+            conn.commit()
+            cur.close()
+            conn.close()
         
         return {
             'statusCode': 200,
