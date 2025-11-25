@@ -1,0 +1,6 @@
+{
+  "stripe-payment": "https://functions.poehali.dev/4a149312-f33f-4b05-b0ea-174164c38ad9",
+  "telegram-webhook": "https://functions.poehali.dev/11a18fe0-c5ac-4e82-8815-12d402b3b132",
+  "auth": "https://functions.poehali.dev/7659d4a3-2394-411f-857c-da1822fa43e0",
+  "generate-code": "https://functions.poehali.dev/5baace72-d29f-474b-9400-53f1b555f8bb"
+}

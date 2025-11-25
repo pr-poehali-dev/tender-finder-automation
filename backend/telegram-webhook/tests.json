@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Test webhook with valid update",
+      "method": "POST",
+      "body": {
+        "message": {
+          "chat": {
+            "id": 12345
+          },
+          "from": {
+            "id": 67890,
+            "username": "testuser"
+          },
+          "text": "/start"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "ok": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test webhook without message",
+      "method": "POST",
+      "body": {},
+      "expectedStatus": 200,
+      "expectedBody": {
+        "ok": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

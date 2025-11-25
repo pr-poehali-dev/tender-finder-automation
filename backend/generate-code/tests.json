@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Test code generation with valid prompt",
+      "method": "POST",
+      "body": {
+        "prompt": "Создай функцию для сложения двух чисел"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "code": "string",
+        "request_id": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing prompt error",
+      "method": "POST",
+      "body": {},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "Prompt is required"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

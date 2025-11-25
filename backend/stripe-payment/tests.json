@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Test payment session creation",
+      "method": "POST",
+      "body": {
+        "user_id": 1,
+        "action": "create_session"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "payment_url": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test premium upgrade",
+      "method": "POST",
+      "body": {
+        "user_id": 1,
+        "action": "upgrade_to_premium"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "user_id": 1
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

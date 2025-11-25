@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Test user registration with telegram_id",
+      "method": "POST",
+      "body": {
+        "telegram_id": 123456789,
+        "username": "TestUser"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "user": {},
+        "request_id": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing credentials error",
+      "method": "POST",
+      "body": {},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "telegram_id or email required"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
